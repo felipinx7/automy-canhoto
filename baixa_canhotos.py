@@ -1,54 +1,173 @@
-#importação das blibliotecas
+# importação das bibliotecas
+import math
 import pyautogui
 import pandas as pd
 import time
 
-# esperas para não dar erros.
-pyautogui.PAUSE = 0.3
+# esperas para não dar erros
+pyautogui.PAUSE = 1
+
+
+def converter_valor(valor):
+    return float(
+        str(valor)
+        .replace("R$", "")
+        .replace(" ", "")
+        .replace(",", ".")
+    )
 
 
 time.sleep(5)
-# lendo as planilhas de canhoto e produtos.
+
+# lendo as planilhas
 planilha_canhoto = pd.read_excel("planilha_canhotos.xlsx")
 planilha_produtos = pd.read_excel("planilha_produtos.xlsx")
 
-# pegando dados das planilhas de canhoto.
+# dados dos canhotos
 metodo_de_pagamento = planilha_canhoto["METODO DE PAGAMENTO"]
 codigo_canhoto = planilha_canhoto["CODIGO"]
 valor_canhoto = planilha_canhoto["VALOR"]
 
-# pegando dados da planinlha de produtos.
+# dados dos produtos
 preco_produto = planilha_produtos["VALOR PRODUTO"]
-qtd_estoque = planilha_produtos["QUANTIDADE ESTOQUE"]
 codigo_produto = planilha_produtos["CODIGO DO PRODUTO"]
 
-# cadastro dos canhotos automatico.
+# cadastro dos canhotos
 for i in range(len(planilha_canhoto)):
-    pyautogui.click(44, 79)
 
-    valor = float(valor_canhoto[i])
+    valor = converter_valor(valor_canhoto[i])
+    metodo = str(metodo_de_pagamento[i]).strip().upper()
 
-    # percorrendo produtos no sistema.
+    produto_escolhido = None
+    quantidade_escolhida = 1
+    menor_diferenca = float("inf")
+
+    # =====================================================
+    # PASSO 1: procurar produto único acima do valor
+    # =====================================================
+
     for j in range(len(planilha_produtos)):
-        preco = float(preco_produto[j])
-        codigo_prod = codigo_produto[j]
 
-        if valor >= preco:
-            quantidade_produtos_a_ser_adicionados = int(valor // preco)
-            resto = valor % preco
+        preco = converter_valor(preco_produto[j])
 
-            resto_inteiro = int(resto)
+        if preco >= valor:
 
-            if quantidade_produtos_a_ser_adicionados == 0:
-                quantidade_produtos_a_ser_adicionados = 1
-                pyautogui.write(f"{quantidade_produtos_a_ser_adicionados}*{codigo_prod}")
-                pyautogui.press("enter")
+            diferenca = preco - valor
 
-            break
+            if diferenca < menor_diferenca:
+                menor_diferenca = diferenca
+                produto_escolhido = j
+                quantidade_escolhida = 1
 
-    # lendo os produtos disponveis para cadastro dos canhotos.
-    metodo = str(metodo_de_pagamento[i]).upper()
-    codigo = codigo_canhoto[i]
+    # =====================================================
+    # PASSO 2: se não encontrou, usa o produto mais caro
+    # =====================================================
 
-    if metodo in ["CREDITO", "DEBITO"]:
-        print(codigo)
+    if produto_escolhido is None:
+
+        maior_preco = 0
+
+        for j in range(len(planilha_produtos)):
+
+            preco = converter_valor(preco_produto[j])
+
+            if preco > maior_preco:
+                maior_preco = preco
+                produto_escolhido = j
+
+        if produto_escolhido is not None:
+            quantidade_escolhida = math.ceil(valor / maior_preco)
+
+    # =====================================================
+    # LANÇAMENTO
+    # =====================================================
+
+    if produto_escolhido is not None:
+
+        preco = converter_valor(preco_produto[produto_escolhido])
+        codigo_prod = str(codigo_produto[produto_escolhido])
+  159990      codigo = str(codigo_canhoto[i]).strip()
+
+        total_produtos = quantidade_escolhida * preco
+
+        diferenca = round(total_produtos - valor, 2)
+        diferenca_formatada = f"{diferenca:.2f}".replace(".", ",")
+
+        texto = f"{quantidade_escolhida}*{codigo_prod}"
+
+        # lança o produto
+        pyautogui.click(x=44, y=79)
+
+        pyautogui.write(texto)
+        pyautogui.press("enter")
+
+        # abre tela de pagamento
+        pyautogui.press("f10")
+        pyautogui.press("tab")
+        pyautogui.press("tab")
+        pyautogui.press("tab")
+
+        # escreve a diferença
+        pyautogui.write(diferenca_formatada)
+
+        pyautogui.press("tab")
+
+        # PIX
+        if metodo == "PIX":
+
+            pyautogui.write("4")
+            pyautogui.press("enter")
+            pyautogui.press("enter")
+
+            time.sleep(3)
+
+            pyautogui.click(x=694, y=437)
+
+            time.sleep(3)
+
+        # CRÉDITO
+        elif metodo == "CREDITO":
+
+            pyautogui.write("2")
+            pyautogui.press("enter")
+
+            time.sleep(3)
+
+            pyautogui.click(x=673, y=354)
+
+            pyautogui.write(codigo)
+
+            pyautogui.click(x=640, y=388)
+
+            time.sleep(3)
+
+            pyautogui.click(x=696, y=437)
+
+            time.sleep(3)
+
+        # DÉBITO
+        elif metodo == "DEBITO":
+
+            pyautogui.write("3")
+            pyautogui.press("enter")
+
+            time.sleep(3)
+
+            pyautogui.click(x=673, y=354)
+
+            pyautogui.write(codigo)
+
+            pyautogui.click(x=640, y=388)
+
+            time.sleep(3)
+
+            pyautogui.click(x=696, y=437)
+
+            time.sleep(3)
+
+    else:
+        print(
+            f"Nenhum produto encontrado para o canhoto de R$ {valor:.2f}"
+        )
+
+print("Processamento finalizado!")
