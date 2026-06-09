@@ -3,6 +3,11 @@ import pyautogui
 import pandas as pd
 import time
 
+# esperas para não dar erros.
+pyautogui.PAUSE = 0.3
+
+
+time.sleep(5)
 # lendo as planilhas de canhoto e produtos.
 planilha_canhoto = pd.read_excel("planilha_canhotos.xlsx")
 planilha_produtos = pd.read_excel("planilha_produtos.xlsx")
