@@ -1,3 +1,4 @@
+
 # importação das bibliotecas
 import math
 import pyautogui
@@ -9,6 +10,10 @@ pyautogui.PAUSE = 1
 
 
 def converter_valor(valor):
+
+    if pd.isna(valor):
+        return float("nan")
+
     return float(
         str(valor)
         .replace("R$", "")
@@ -35,8 +40,35 @@ codigo_produto = planilha_produtos["CODIGO DO PRODUTO"]
 # cadastro dos canhotos
 for i in range(len(planilha_canhoto)):
 
+    # ignora linhas sem valor
+    if pd.isna(valor_canhoto[i]):
+        print(f"Linha {i + 1}: valor vazio")
+        continue
+
     valor = converter_valor(valor_canhoto[i])
-    metodo = str(metodo_de_pagamento[i]).strip().upper()
+
+    metodo = str(
+        metodo_de_pagamento[i]
+    ).strip().upper()
+
+    # corrige PX -> PIX
+    if metodo == "PX":
+        metodo = "PIX"
+
+    # código só é necessário para débito e crédito
+    codigo = ""
+
+    if metodo in ["DEBITO", "CREDITO"]:
+
+        if pd.notna(codigo_canhoto[i]):
+            codigo = str(
+                int(float(codigo_canhoto[i]))
+            )
+        else:
+            print(
+                f"Linha {i + 1}: código vazio para {metodo}"
+            )
+            continue
 
     produto_escolhido = None
     quantidade_escolhida = 1
@@ -48,13 +80,22 @@ for i in range(len(planilha_canhoto)):
 
     for j in range(len(planilha_produtos)):
 
-        preco = converter_valor(preco_produto[j])
+        if pd.isna(preco_produto[j]):
+            continue
+
+        preco = converter_valor(
+            preco_produto[j]
+        )
+
+        if pd.isna(preco):
+            continue
 
         if preco >= valor:
 
             diferenca = preco - valor
 
             if diferenca < menor_diferenca:
+
                 menor_diferenca = diferenca
                 produto_escolhido = j
                 quantidade_escolhida = 1
@@ -69,14 +110,28 @@ for i in range(len(planilha_canhoto)):
 
         for j in range(len(planilha_produtos)):
 
-            preco = converter_valor(preco_produto[j])
+            if pd.isna(preco_produto[j]):
+                continue
+
+            preco = converter_valor(
+                preco_produto[j]
+            )
+
+            if pd.isna(preco):
+                continue
 
             if preco > maior_preco:
+
                 maior_preco = preco
                 produto_escolhido = j
 
-        if produto_escolhido is not None:
-            quantidade_escolhida = math.ceil(valor / maior_preco)
+        if (
+            produto_escolhido is not None
+            and maior_preco > 0
+        ):
+            quantidade_escolhida = math.ceil(
+                valor / maior_preco
+            )
 
     # =====================================================
     # LANÇAMENTO
@@ -84,19 +139,38 @@ for i in range(len(planilha_canhoto)):
 
     if produto_escolhido is not None:
 
-        preco = converter_valor(preco_produto[produto_escolhido])
-        codigo_prod = str(codigo_produto[produto_escolhido])
-  159990      codigo = str(codigo_canhoto[i]).strip()
+        preco = converter_valor(
+            preco_produto[produto_escolhido]
+        )
 
-        total_produtos = quantidade_escolhida * preco
+        codigo_prod = str(
+            codigo_produto[produto_escolhido]
+        )
 
-        diferenca = round(total_produtos - valor, 2)
-        diferenca_formatada = f"{diferenca:.2f}".replace(".", ",")
+        total_produtos = (
+            quantidade_escolhida * preco
+        )
 
-        texto = f"{quantidade_escolhida}*{codigo_prod}"
+        diferenca = round(
+            total_produtos - valor,
+            2
+        )
+
+        diferenca_formatada = (
+            f"{diferenca:.2f}"
+            .replace(".", ",")
+        )
+
+        texto = (
+            f"{quantidade_escolhida}"
+            f"*{codigo_prod}"
+        )
 
         # lança o produto
-        pyautogui.click(x=44, y=79)
+        pyautogui.click(
+            x=44,
+            y=79
+        )
 
         pyautogui.write(texto)
         pyautogui.press("enter")
@@ -108,7 +182,9 @@ for i in range(len(planilha_canhoto)):
         pyautogui.press("tab")
 
         # escreve a diferença
-        pyautogui.write(diferenca_formatada)
+        pyautogui.write(
+            diferenca_formatada
+        )
 
         pyautogui.press("tab")
 
@@ -121,7 +197,10 @@ for i in range(len(planilha_canhoto)):
 
             time.sleep(3)
 
-            pyautogui.click(x=694, y=437)
+            pyautogui.click(
+                x=694,
+                y=437
+            )
 
             time.sleep(3)
 
@@ -133,15 +212,24 @@ for i in range(len(planilha_canhoto)):
 
             time.sleep(3)
 
-            pyautogui.click(x=673, y=354)
+            pyautogui.click(
+                x=673,
+                y=354
+            )
 
             pyautogui.write(codigo)
 
-            pyautogui.click(x=640, y=388)
+            pyautogui.click(
+                x=640,
+                y=388
+            )
 
             time.sleep(3)
 
-            pyautogui.click(x=696, y=437)
+            pyautogui.click(
+                x=696,
+                y=437
+            )
 
             time.sleep(3)
 
@@ -153,21 +241,40 @@ for i in range(len(planilha_canhoto)):
 
             time.sleep(3)
 
-            pyautogui.click(x=673, y=354)
+            pyautogui.click(
+                x=673,
+                y=354
+            )
 
             pyautogui.write(codigo)
 
-            pyautogui.click(x=640, y=388)
+            pyautogui.click(
+                x=640,
+                y=388
+            )
 
             time.sleep(3)
 
-            pyautogui.click(x=696, y=437)
+            pyautogui.click(
+                x=696,
+                y=437
+            )
 
             time.sleep(3)
+
+        else:
+
+            print(
+                f"Linha {i + 1}: método "
+                f"não reconhecido ({metodo})"
+            )
 
     else:
+
         print(
-            f"Nenhum produto encontrado para o canhoto de R$ {valor:.2f}"
+            f"Nenhum produto encontrado "
+            f"para o canhoto de "
+            f"R$ {valor:.2f}"
         )
 
 print("Processamento finalizado!")
