@@ -1,4 +1,3 @@
-
 # importação das bibliotecas
 import math
 import pyautogui
@@ -38,7 +37,7 @@ preco_produto = planilha_produtos["VALOR PRODUTO"]
 codigo_produto = planilha_produtos["CODIGO DO PRODUTO"]
 
 # cadastro dos canhotos
-for i in range(len(planilha_canhoto)):
+for i in range(len(planilha_canhoto)):          
 
     # ignora linhas sem valor
     if pd.isna(valor_canhoto[i]):
@@ -61,9 +60,7 @@ for i in range(len(planilha_canhoto)):
     if metodo in ["DEBITO", "CREDITO"]:
 
         if pd.notna(codigo_canhoto[i]):
-            codigo = str(
-                int(float(codigo_canhoto[i]))
-            )
+           codigo = ( str(codigo_canhoto[i]).replace(".0", "").strip())
         else:
             print(
                 f"Linha {i + 1}: código vazio para {metodo}"
@@ -74,7 +71,7 @@ for i in range(len(planilha_canhoto)):
     quantidade_escolhida = 1
     menor_diferenca = float("inf")
 
-    # =====================================================
+    # ===================================================== 
     # PASSO 1: procurar produto único acima do valor
     # =====================================================
 
@@ -83,9 +80,7 @@ for i in range(len(planilha_canhoto)):
         if pd.isna(preco_produto[j]):
             continue
 
-        preco = converter_valor(
-            preco_produto[j]
-        )
+        preco = converter_valor(preco_produto[j])
 
         if pd.isna(preco):
             continue
@@ -113,9 +108,7 @@ for i in range(len(planilha_canhoto)):
             if pd.isna(preco_produto[j]):
                 continue
 
-            preco = converter_valor(
-                preco_produto[j]
-            )
+            preco = converter_valor(preco_produto[j])
 
             if pd.isna(preco):
                 continue
@@ -145,7 +138,7 @@ for i in range(len(planilha_canhoto)):
 
         codigo_prod = str(
             codigo_produto[produto_escolhido]
-        )
+        ).replace(".0", "")
 
         total_produtos = (
             quantidade_escolhida * preco
@@ -167,11 +160,7 @@ for i in range(len(planilha_canhoto)):
         )
 
         # lança o produto
-        pyautogui.click(
-            x=44,
-            y=79
-        )
-
+        pyautogui.click(x=44, y=79)
         pyautogui.write(texto)
         pyautogui.press("enter")
 
@@ -182,10 +171,7 @@ for i in range(len(planilha_canhoto)):
         pyautogui.press("tab")
 
         # escreve a diferença
-        pyautogui.write(
-            diferenca_formatada
-        )
-
+        pyautogui.write(diferenca_formatada)
         pyautogui.press("tab")
 
         # PIX
@@ -197,10 +183,7 @@ for i in range(len(planilha_canhoto)):
 
             time.sleep(3)
 
-            pyautogui.click(
-                x=694,
-                y=437
-            )
+            pyautogui.click(x=694, y=437)
 
             time.sleep(3)
 
@@ -212,24 +195,14 @@ for i in range(len(planilha_canhoto)):
 
             time.sleep(3)
 
-            pyautogui.click(
-                x=673,
-                y=354
-            )
-
+            pyautogui.click(x=673, y=354)
             pyautogui.write(codigo)
-
-            pyautogui.click(
-                x=640,
-                y=388
-            )
+            pyautogui.click(x=640, y=388)
 
             time.sleep(3)
 
-            pyautogui.click(
-                x=696,
-                y=437
-            )
+            pyautogui.click(x=692, y=432)
+
 
             time.sleep(3)
 
@@ -241,40 +214,27 @@ for i in range(len(planilha_canhoto)):
 
             time.sleep(3)
 
-            pyautogui.click(
-                x=673,
-                y=354
-            )
-
+            pyautogui.click(x=673, y=354)
             pyautogui.write(codigo)
-
-            pyautogui.click(
-                x=640,
-                y=388
-            )
+            pyautogui.click(x=640, y=388)
 
             time.sleep(3)
 
-            pyautogui.click(
-                x=696,
-                y=437
-            )
+            pyautogui.click(x=692, y=432)
+
 
             time.sleep(3)
 
         else:
 
             print(
-                f"Linha {i + 1}: método "
-                f"não reconhecido ({metodo})"
+                f"Linha {i + 1}: método não reconhecido ({metodo})"
             )
 
     else:
 
         print(
-            f"Nenhum produto encontrado "
-            f"para o canhoto de "
-            f"R$ {valor:.2f}"
+            f"Nenhum produto encontrado para o canhoto de R$ {valor:.2f}"
         )
 
 print("Processamento finalizado!")
