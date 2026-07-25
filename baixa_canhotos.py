@@ -180,10 +180,9 @@ for i in range(len(planilha_canhoto)):
             pyautogui.write("4")
             pyautogui.press("enter")
             pyautogui.press("enter")
-
             time.sleep(3)
 
-            pyautogui.click(x=698, y=434)
+            pyautogui.click(x=676, y=435)
 
             time.sleep(3)
 
@@ -201,7 +200,7 @@ for i in range(len(planilha_canhoto)):
 
             time.sleep(3)
 
-            pyautogui.click(x=698, y=434)
+            pyautogui.click(x=676, y=435)
 
 
             time.sleep(3)
@@ -220,7 +219,7 @@ for i in range(len(planilha_canhoto)):
 
             time.sleep(3)
 
-            pyautogui.click(x=698, y=434)
+            pyautogui.click(x=676, y=435)
 
 
             time.sleep(3)
