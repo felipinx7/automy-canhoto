@@ -55,7 +55,7 @@ for i in range(len(planilha_canhoto)):
         metodo = "PIX"
 
     # código só é necessário para débito e crédito
-    codigo = ""
+    codigo = "" 
 
     if metodo in ["DEBITO", "CREDITO"]:
 
