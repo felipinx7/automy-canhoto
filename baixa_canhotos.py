@@ -60,7 +60,7 @@ for i in range(len(planilha_canhoto)):
     if metodo in ["DEBITO", "CREDITO"]:
 
         if pd.notna(codigo_canhoto[i]):
-           codigo = ( str(codigo_canhoto[i]).replace(".0", "").strip())
+           codigo = ( str(codigo_canhoto[i]).replace(".0", "").strip().upper())
         else:
             print(
                 f"Linha {i + 1}: código vazio para {metodo}"
